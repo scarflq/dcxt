@@ -1,0 +1,25 @@
+*/node_modules/
+
+# properties
+*.properties
+
+# idea ignore
+.idea/
+*.ipr
+*.iml
+*.iws
+
+# maven ignore
+target/
+*.jar
+*.war
+*.zip
+*.tar
+*.tar.gz
+
+# system ignore
+.DS_Store
+Thumbs.db
+
+out/
+LCXMB2.iml
