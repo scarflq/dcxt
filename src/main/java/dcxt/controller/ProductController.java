@@ -75,14 +75,14 @@ public class ProductController{
     }
 
 
-    @RequestMapping("/sorts")
+    @RequestMapping("/categorys")
     @ResponseBody
     public Msg getSorts() {
         List<Category> list = productService.getSorts();
         return Msg.success("").add("sorts", list);
     }
 
-    @RequestMapping("/caidan")
+    @RequestMapping("/menu")
     @ResponseBody
     public Msg getMenus(@RequestParam(value = "pn", defaultValue = "1") Integer pn) {
         PageHelper.startPage(pn, 10);
@@ -91,9 +91,15 @@ public class ProductController{
         return Msg.success("").add("pageInfo", page);
     }
 
-    @RequestMapping(value="/cai",method=RequestMethod.POST)
+    @RequestMapping(value="/xinzeng",method=RequestMethod.POST)
     @ResponseBody
-    public Msg saveP(@Valid Product product,BindingResult result){
+    public Msg xinzeng(String title,String description, String img,float price ,int category){
+        Product product=new Product();
+        product.setCategory(category);
+        product.setDescription(description);
+        product.setTitle(title);
+        product.setPrice(price);
+        product.setImg(img);
         product.setStatus(0);
         product.setGood(0);
         Date date = new Date();
@@ -108,14 +114,14 @@ public class ProductController{
     public Msg changeStatus1(Product p, HttpServletRequest request) {
         p.setStatus(1);
         productService.changeStatus(p);
-        return Msg.success("");
+        return Msg.success("下架成功");
     }
     @ResponseBody
     @RequestMapping(value = "/shangjia/{id}", method = RequestMethod.PUT)
     public Msg changeStatus2(Product p, HttpServletRequest request) {
         p.setStatus(0);
         productService.changeStatus(p);
-        return Msg.success("");
+        return Msg.success("上架成功");
     }
 
     @ResponseBody
@@ -133,7 +139,7 @@ public class ProductController{
         return Msg.success("").add("pageInfo", page);
     }
 
-    @RequestMapping(value="/gai/{id}",method=RequestMethod.GET)
+    @RequestMapping(value="/gai1",method=RequestMethod.GET)
     @ResponseBody
     public Msg getMe(@PathVariable("id")Integer id){
         Product men = productService.getP(id);
@@ -141,10 +147,17 @@ public class ProductController{
     }
 
     @ResponseBody
-    @RequestMapping(value="/gai/{id}",method=RequestMethod.PUT)
-    public Msg saveMe(Product p,HttpServletRequest request){
+    @RequestMapping(value="/gai2",method=RequestMethod.POST)
+    public Msg saveMe(int id,String title,String description, String img,float price ,int category){
+        Product p=new Product();
+        p.setId(id);
+        p.setCategory(category);
+        p.setDescription(description);
+        p.setTitle(title);
+        p.setPrice(price);
+        p.setImg(img);
         productService.updateP(p);
-        return Msg.success("");
+        return Msg.success("修改成功");
     }
 
 }

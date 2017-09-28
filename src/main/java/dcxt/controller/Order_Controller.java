@@ -4,6 +4,7 @@ import dcxt.bean.Msg;
 import javax.servlet.http.HttpServletRequest;
 
 import dcxt.pojo.Order_;
+import dcxt.pojo.Product;
 import dcxt.service.Order_Service;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -31,12 +32,22 @@ public class Order_Controller{
         return Msg.success("").add("order", order);
     }
 
+/*    @ResponseBody
+    @RequestMapping(value="/jieshou",method=RequestMethod.POST)
+    public Msg changeStatus1(int id){
+        Order_ o=new Order_();
+        o.setId(id);
+        o.setStatus(2);
+        order_Service.changeStatus(o);
+        return Msg.success("接收成功！");
+    }*/
+
     @ResponseBody
     @RequestMapping(value = "/jieshou/{id}", method = RequestMethod.PUT)
     public Msg changeStatus1(Order_ o, HttpServletRequest request) {
         o.setStatus(2);
         order_Service.changeStatus(o);
-        return Msg.success("");
+        return Msg.success("接收成功！");
     }
 
     @ResponseBody
@@ -44,7 +55,7 @@ public class Order_Controller{
     public Msg changeStatus2(Order_ o, HttpServletRequest request) {
         o.setStatus(5);
         order_Service.changeStatus(o);
-        return Msg.success("");
+        return Msg.success("拒收成功！");
     }
 
     @ResponseBody
@@ -52,7 +63,7 @@ public class Order_Controller{
     public Msg changeStatus3(Order_ o, HttpServletRequest request) {
         o.setStatus(3);
         order_Service.changeStatus(o);
-        return Msg.success("");
+        return Msg.success("送货！");
     }
 
     @ResponseBody
@@ -60,7 +71,7 @@ public class Order_Controller{
     public Msg changeStatus4(Order_ o, HttpServletRequest request) {
         o.setStatus(5);
         order_Service.changeStatus(o);
-        return Msg.success("");
+        return Msg.success("取消订单！");
     }
 
     @ResponseBody
@@ -68,6 +79,6 @@ public class Order_Controller{
     public Msg changeStatus5(Order_ o, HttpServletRequest request) {
         o.setStatus(4);
         order_Service.changeStatus(o);
-        return Msg.success("");
+        return Msg.success("货物已送达！");
     }
 }

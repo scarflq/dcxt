@@ -21,6 +21,8 @@ import java.io.UnsupportedEncodingException;
 import java.sql.Timestamp;
 import java.util.Date;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Controller
 @RequestMapping("")
@@ -30,10 +32,10 @@ public class UserController {
 
     @ResponseBody
     @RequestMapping(value="/login",method=RequestMethod.POST)
-    public Msg login(@RequestParam(value = "username") String uname,@RequestParam(value = "password") String pwd, HttpSession session){
-        User_login ul = userService.login(uname);
+    public Msg login(@RequestParam(value = "username") String username,@RequestParam(value = "password") String password, HttpSession session){
+        User_login ul = userService.login(username);
         if(ul!=null){
-            if (pwd.equals(ul.getPassword())){
+            if (password.equals(ul.getPassword())){
                 User_info ui=userService.getStates(ul.getUsername());
                 if(ui.getStatus()!=1){
                     session.setAttribute("username",ui.getUsername());
@@ -56,20 +58,22 @@ public class UserController {
 
     @ResponseBody
     @RequestMapping(value="/register",method=RequestMethod.POST)
-    public Msg save(@RequestParam(value = "username") String uname,@RequestParam(value = "password") String pwd,@RequestParam(value = "password1") String pwd1){
-        if (pwd.equals(pwd1)) {
-            User_login user_login=userService.login(uname);
-            if (user_login!=null)
-            {
+    public Msg save(@RequestParam(value = "username") String username,@RequestParam(value = "password") String password,@RequestParam(value = "password1") String password1){
+        if (password.equals(password1)) {
+            User_login user_login=userService.login(username);
+            if (user_login!=null) {
                 return Msg.fail("用户名已存在！");
-            }
-            else{
+            } else if (!isStandardUsername(username)){
+                return Msg.success("用户名格式错误 ");
+            }else if (!isStandardPassword(password)){
+                return Msg.success("密码格式错误 ");
+            } else{
                 User_login ul=new User_login();
-                ul.setUsername(uname);
-                ul.setPassword(pwd);
+                ul.setUsername(username);
+                ul.setPassword(password);
                 userService.saveul(ul);
                 User_info ui=new User_info();
-                ui.setUsername(uname);
+                ui.setUsername(username);
                 ui.setStatus(0);
                 Date date = new Date();
                 Timestamp timeStamp = new Timestamp(date.getTime());
@@ -84,6 +88,23 @@ public class UserController {
             return Msg.fail("两次输入的密码不同，请重新输入！");
         }
     }
+    
+
+    public boolean isStandardUsername(String username){
+        Pattern p = Pattern.compile("[A-Za-z0-9]{6,16}");
+        Matcher m = p.matcher(username);
+        return m.matches();
+    }
+
+    public boolean isStandardPassword(String password){
+        Pattern p = Pattern.compile("\\w{6,16}");
+        Matcher m = p.matcher(password);
+        return m.matches();
+    }
+
+
+
+
 
 
     @ResponseBody
@@ -132,32 +153,29 @@ public class UserController {
     }
 
     @ResponseBody
-    @RequestMapping(value="/zhuxiao",method=RequestMethod.PUT)
+    @RequestMapping(value="/zhuxiao",method=RequestMethod.POST)
     public Msg zhuxiaoUs(String username){
         User_info u=new User_info();
         u.setStatus(1);
         u.setUsername(username);
-        int i=userService.delete(u);
-        if(i==1){
-            return Msg.success("注销成功！");
-        }
-        else{
-            return  Msg.fail("注销失败！").add("l",i);
-        }
+        userService.update(u);
+        return Msg.success("注销成功！");
     }
 
     @ResponseBody
-    @RequestMapping(value="/qiyong/{id}",method=RequestMethod.PUT)
-    public Msg qiyongUs(User_info u){
+    @RequestMapping(value="/qiyong",method=RequestMethod.POST)
+    public Msg qiyongUs(String username){
+        User_info u=new User_info();
+        u.setUsername(username);
         u.setStatus(0);
-        userService.delete(u);
-        return Msg.success("");
+        userService.update(u);
+        return Msg.success("启用成功！");
     }
 
     /*模糊查询*/
     /*查找用户名*/
     @ResponseBody
-    @RequestMapping(value="/chauser/{title}",method=RequestMethod.GET)
+    @RequestMapping(value="/searchUser/{title}",method=RequestMethod.GET)
     public Msg searchuser(@RequestParam(value = "pn", defaultValue = "1") Integer pn,@PathVariable("title")String title){
         PageHelper.startPage(pn, 10);
         String title1 = null;
@@ -179,8 +197,9 @@ public class UserController {
         return Msg.success("").add("user_info", men);
     }
 
+
     @ResponseBody
-    @RequestMapping(value="/adChangeU2}",method=RequestMethod.POST)
+    @RequestMapping(value="/adChangeU2",method=RequestMethod.POST)
     public Msg adChangeU2(String username, float money, String address, String tel){
         User_info ui=new User_info();
         ui.setUsername(username);
