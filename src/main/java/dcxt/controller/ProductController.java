@@ -41,7 +41,8 @@ public class ProductController{
 
     @Resource
     QiNiuImageStyleService qiNiuImageStyleService;
-
+    @RequestMapping(value = "/upload", method = RequestMethod.POST)
+    @ResponseBody
     public Msg Upload(@RequestParam("file") MultipartFile file,@RequestParam String width,HttpServletRequest request) throws IOException {
 
         // 获得原始文件名
