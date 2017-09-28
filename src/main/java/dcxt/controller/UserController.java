@@ -1,8 +1,8 @@
 package dcxt.controller;
 
 import dcxt.bean.Msg;
-import dcxt.pojo.Product;
 import dcxt.pojo.User_info;
+import dcxt.pojo.User_login;
 import dcxt.service.UserService;
 import javax.servlet.http.HttpServletRequest;
 import org.springframework.stereotype.Controller;
@@ -12,10 +12,14 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMethod;
 import javax.annotation.Resource;
+import javax.servlet.http.HttpSession;
+
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 
 import java.io.UnsupportedEncodingException;
+import java.sql.Timestamp;
+import java.util.Date;
 import java.util.List;
 
 @Controller
@@ -23,6 +27,100 @@ import java.util.List;
 public class UserController {
     @Resource
     UserService userService;
+
+    @ResponseBody
+    @RequestMapping(value="/login",method=RequestMethod.POST)
+    public Msg login(@RequestParam(value = "username") String uname,@RequestParam(value = "password") String pwd, HttpSession session){
+        User_login ul = userService.login(uname);
+        if(ul!=null){
+            if (pwd.equals(ul.getPassword())){
+                User_info ui=userService.getStates(ul.getUsername());
+                if(ui.getStatus()!=1){
+                    session.setAttribute("username",ui.getUsername());
+                    return Msg.success("登录成功！");
+                }
+                else{
+                    return Msg.fail("登录失败！").add("k","用户名失效！");
+                }
+            }
+            else{
+                return Msg.fail("登录失败！").add("k","密码错误！");
+            }
+        }
+        else{
+            return Msg.fail("登录失败！").add("k","无此用户！");
+        }
+
+    }
+
+
+    @ResponseBody
+    @RequestMapping(value="/register",method=RequestMethod.POST)
+    public Msg save(@RequestParam(value = "username") String uname,@RequestParam(value = "password") String pwd,@RequestParam(value = "password1") String pwd1){
+        if (pwd.equals(pwd1)) {
+            User_login user_login=userService.login(uname);
+            if (user_login!=null)
+            {
+                return Msg.fail("用户名已存在！");
+            }
+            else{
+                User_login ul=new User_login();
+                ul.setUsername(uname);
+                ul.setPassword(pwd);
+                userService.saveul(ul);
+                User_info ui=new User_info();
+                ui.setUsername(uname);
+                ui.setStatus(0);
+                Date date = new Date();
+                Timestamp timeStamp = new Timestamp(date.getTime());
+                ui.setCreateTime(timeStamp);
+                float f=0;
+                ui.setMoney(f);
+                userService.saveui(ui);
+                return Msg.success("注册成功！");
+            }
+        }
+        else{
+            return Msg.fail("两次输入的密码不同，请重新输入！");
+        }
+    }
+
+
+    @ResponseBody
+    @RequestMapping(value="/clear",method=RequestMethod.POST)
+    public Msg clear( HttpSession session){
+        session.invalidate();
+        return Msg.success("注销成功");
+    }
+
+    @ResponseBody
+    @RequestMapping(value="/changeUser",method=RequestMethod.POST)
+    public Msg changeU(HttpSession session){
+        if(session.getAttribute("username")!=null){
+            User_info men = userService.getU(session.getAttribute("username").toString());
+            return Msg.success("").add("user_info", men);
+        }
+        else{
+            return Msg.fail("请先登录！");
+        }
+    }
+
+    @ResponseBody
+    @RequestMapping(value="/changeUser2",method=RequestMethod.POST)
+    public Msg changeU2(String username, String password, String address, String tel){
+        User_info ui=new User_info();
+        ui.setUsername(username);
+        ui.setAddress(address);
+        ui.setTel(tel);
+        userService.update(ui);
+        User_login ul=new User_login();
+        ul.setUsername(username);
+        ul.setPassword(password);
+        userService.update2(ul);
+        return Msg.success("修改成功！");
+    }
+
+
 
     @RequestMapping("/getuser")
     @ResponseBody
@@ -34,16 +132,23 @@ public class UserController {
     }
 
     @ResponseBody
-    @RequestMapping(value="/zhuxiao/{id}",method=RequestMethod.PUT)
-    public Msg zhuxiaoUs(User_info u, HttpServletRequest request){
+    @RequestMapping(value="/zhuxiao",method=RequestMethod.PUT)
+    public Msg zhuxiaoUs(String username){
+        User_info u=new User_info();
         u.setStatus(1);
-        userService.delete(u);
-        return Msg.success("注销成功！");
+        u.setUsername(username);
+        int i=userService.delete(u);
+        if(i==1){
+            return Msg.success("注销成功！");
+        }
+        else{
+            return  Msg.fail("注销失败！").add("l",i);
+        }
     }
 
     @ResponseBody
     @RequestMapping(value="/qiyong/{id}",method=RequestMethod.PUT)
-    public Msg qiyongUs(User_info u, HttpServletRequest request){
+    public Msg qiyongUs(User_info u){
         u.setStatus(0);
         userService.delete(u);
         return Msg.success("");
@@ -67,18 +172,23 @@ public class UserController {
     }
 
     /*修改用户信息*/
-    @RequestMapping(value="/gu/{id}",method=RequestMethod.GET)
+    @RequestMapping(value="/adChangeU",method=RequestMethod.POST)
     @ResponseBody
-    public Msg getU(@PathVariable("id")String username){
+    public Msg adChangeU(String username){
         User_info men = userService.getU(username);
         return Msg.success("").add("user_info", men);
     }
 
     @ResponseBody
-    @RequestMapping(value="/gaiu/{id}",method=RequestMethod.PUT)
-    public Msg saveU(User_info u, HttpServletRequest request){
-        userService.update(u);
-        return Msg.success("");
+    @RequestMapping(value="/adChangeU2}",method=RequestMethod.POST)
+    public Msg adChangeU2(String username, float money, String address, String tel){
+        User_info ui=new User_info();
+        ui.setUsername(username);
+        ui.setAddress(address);
+        ui.setTel(tel);
+        ui.setMoney(money);
+        userService.update(ui);
+        return Msg.success("修改成功！");
     }
 
     /*按照余额排序*/
