@@ -2,9 +2,7 @@ package dcxt.controller;
 
 import dcxt.bean.Msg;
 import javax.servlet.http.HttpServletRequest;
-
 import dcxt.pojo.Order_;
-import dcxt.pojo.Product;
 import dcxt.service.Order_Service;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -12,8 +10,11 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import javax.annotation.Resource;
+import javax.servlet.http.HttpSession;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import java.sql.Timestamp;
+import java.util.Date;
 import java.util.List;
 
 
@@ -81,4 +82,44 @@ public class Order_Controller{
         order_Service.changeStatus(o);
         return Msg.success("货物已送达！");
     }
+
+    @ResponseBody
+    @RequestMapping(value="/xiadan",method = RequestMethod.POST)
+    public Msg xiadan(String detail, HttpSession session){
+        if(session.getAttribute("username")!=null){
+            Order_ o=new Order_();
+            o.setStatus(1);
+            String uid="lq";
+            uid=session.getAttribute("username").toString();
+            o.setuId(uid);
+            Date date = new Date();
+            Timestamp timeStamp = new Timestamp(date.getTime());
+            o.setCreateTime(timeStamp);
+            o.setDetail(detail);
+            int i=order_Service.xiadan(o);
+            if (i==1) {
+                return Msg.success("下单成功！");
+            }else{
+                return Msg.fail("下单失败！");
+            }
+        }
+        else{
+            return Msg.fail("请先登录！");
+        }
+    }
+
+    @ResponseBody
+    @RequestMapping(value="/comment",method = RequestMethod.POST)
+    public Msg comment(String comment, int id){
+        Order_ o=new Order_();
+        o.setId(id);
+        o.setComment(comment);
+        int i=order_Service.comment(o);
+        if (i==1) {
+            return Msg.success("评论成功！");
+        }else{
+            return Msg.fail("评论失败！");
+        }
+    }
+
 }

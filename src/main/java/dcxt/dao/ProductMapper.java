@@ -32,4 +32,11 @@ public interface ProductMapper {
 
     List<Product> selectByExampleWithSort(ProductExample example);
 
+    List<Product> selectByCategory(int category);
+
+    List<Product> selectByExampleWithSortf(ProductExample example);
+
+    List<Product> selectByExamplef(String title);
+
+    List<Product> selectByCategoryf(int category);
 }

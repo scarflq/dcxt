@@ -4,7 +4,6 @@ import dcxt.bean.Msg;
 import dcxt.pojo.User_info;
 import dcxt.pojo.User_login;
 import dcxt.service.UserService;
-import javax.servlet.http.HttpServletRequest;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -13,10 +12,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMethod;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpSession;
-
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
-
 import java.io.UnsupportedEncodingException;
 import java.sql.Timestamp;
 import java.util.Date;

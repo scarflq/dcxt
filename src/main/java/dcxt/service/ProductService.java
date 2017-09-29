@@ -45,4 +45,32 @@ public class ProductService {
     public List<Category> getSorts() {
         return categoryMapper.selectByExample(null);
     }
+
+    public List<Product> getCategory(int category) {
+        return productMapper.selectByCategory(category);
+    }
+
+    public int addCategorys(Category c) {
+        return categoryMapper.insertSelective(c);
+    }
+
+    public int deleteCategorys(int id) {
+        return categoryMapper.deleteByPrimaryKey(id);
+    }
+
+    public int updateCategorys(Category c) {
+        return categoryMapper.updateByPrimaryKeySelective(c);
+    }
+
+    public List<Product> getAllf() {
+        return productMapper.selectByExampleWithSortf(null);
+    }
+
+    public List<Product> searchNamef(String title) {
+        return productMapper.selectByExamplef(title);
+    }
+
+    public List<Product> getCategoryf(int category) {
+        return productMapper.selectByCategoryf(category);
+    }
 }

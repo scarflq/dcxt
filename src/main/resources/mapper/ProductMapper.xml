@@ -98,6 +98,13 @@
     left join category ca on m.category=ca.c_id
     where title like "%"#{title}"%" order by id
   </select>
+  <select id="selectByExamplef" parameterType="java.lang.String" resultMap="WithSortResultMap">
+    select
+    <include refid="WithSort_Column_List" />
+    from product m
+    left join category ca on m.category=ca.c_id
+    where m.status=0 and title like "%"#{title}"%" order by id
+  </select>
   <select id="selectByExampleWithSort" parameterType="dcxt.pojo.ProductExample" resultMap="WithSortResultMap">
     select
     <if test="distinct">
@@ -112,6 +119,27 @@
     <if test="orderByClause != null">
       order by ${orderByClause}
     </if>
+  </select>
+  <select id="selectByExampleWithSortf" parameterType="dcxt.pojo.ProductExample" resultMap="WithSortResultMap">
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="WithSort_Column_List" />
+    from product m
+    left join category ca on m.category=ca.c_id WHERE m.status=0
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByCategory" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select * from product where category = #{category,jdbcType=INTEGER}
+  </select>
+  <select id="selectByCategoryf" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select * from product where status = 0 AND category = #{category,jdbcType=INTEGER}
   </select>
   <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
     select 

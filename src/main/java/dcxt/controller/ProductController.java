@@ -5,7 +5,6 @@ import dcxt.pojo.Category;
 import dcxt.pojo.Product;
 import dcxt.service.ProductService;
 import javax.servlet.http.HttpServletRequest;
-
 import dcxt.service.QiNiuImageStyleService;
 import dcxt.service.UploadService;
 import org.springframework.stereotype.Controller;
@@ -26,8 +25,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 import javax.servlet.ServletContext;
-import javax.validation.Valid;
-import org.springframework.validation.BindingResult;
 
 
 @Controller
@@ -74,14 +71,57 @@ public class ProductController{
         return Msg.success("上传成功").add("imageUrl", imageUrl);
     }
 
-
-    @RequestMapping("/categorys")
+    /*对分类的操作*/
+    /*增*/
+    @RequestMapping("/addCategorys")
     @ResponseBody
-    public Msg getSorts() {
+    public Msg addCategorys(String title) {
+        Category c=new Category();
+        c.setcTitle(title);
+        int i=productService.addCategorys(c);
+        if (i==1) {
+            return Msg.success("新增成功！");
+        }else{
+            return Msg.fail("新增失败！");
+        }
+    }
+
+    /*删*/
+    @RequestMapping("/deleteCategorys")
+    @ResponseBody
+    public Msg deleteCategorys(int id) {
+        int i=productService.deleteCategorys(id);
+        if (i==1) {
+            return Msg.success("删除成功！");
+        }else{
+            return Msg.fail("删除失败！");
+        }
+    }
+
+    /*改*/
+    @RequestMapping("/updateCategorys")
+    @ResponseBody
+    public Msg updateCategorys(int id, String title) {
+        Category c=new Category();
+        c.setcId(id);
+        c.setcTitle(title);
+        int i=productService.updateCategorys(c);
+        if (i==1) {
+            return Msg.success("修改成功！");
+        }else{
+            return Msg.fail("修改失败！");
+        }
+    }
+
+    /*查*/
+    @RequestMapping("/getCategorys")
+    @ResponseBody
+    public Msg getCategorys() {
         List<Category> list = productService.getSorts();
         return Msg.success("").add("sorts", list);
     }
 
+    /*显示菜单*/
     @RequestMapping("/menu")
     @ResponseBody
     public Msg getMenus(@RequestParam(value = "pn", defaultValue = "1") Integer pn) {
@@ -91,6 +131,7 @@ public class ProductController{
         return Msg.success("").add("pageInfo", page);
     }
 
+    /*新增菜品*/
     @RequestMapping(value="/xinzeng",method=RequestMethod.POST)
     @ResponseBody
     public Msg xinzeng(String title,String description, String img,float price ,int category){
@@ -109,6 +150,7 @@ public class ProductController{
         return Msg.success("新增成功");
     }
 
+    /*下架*/
     @ResponseBody
     @RequestMapping(value = "/xiajia/{id}", method = RequestMethod.PUT)
     public Msg changeStatus1(Product p, HttpServletRequest request) {
@@ -116,6 +158,8 @@ public class ProductController{
         productService.changeStatus(p);
         return Msg.success("下架成功");
     }
+
+    /*上架*/
     @ResponseBody
     @RequestMapping(value = "/shangjia/{id}", method = RequestMethod.PUT)
     public Msg changeStatus2(Product p, HttpServletRequest request) {
@@ -124,21 +168,17 @@ public class ProductController{
         return Msg.success("上架成功");
     }
 
+    /*通过名字模糊查询*/
     @ResponseBody
-    @RequestMapping(value="/search/{title}",method=RequestMethod.GET)
-    public Msg searchCai(@RequestParam(value = "pn", defaultValue = "1") Integer pn,@PathVariable("title")String title){
+    @RequestMapping(value="/search",method=RequestMethod.POST)
+    public Msg searchCai(@RequestParam(value = "pn", defaultValue = "1") Integer pn,String title){
         PageHelper.startPage(pn, 10);
-        String title1 = null;
-        try {
-            title1 = new String(title.getBytes("ISO-8859-1"),"UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
-        List<Product> men=productService.searchName(title1);
+        List<Product> men=productService.searchName(title);
         PageInfo page = new PageInfo(men, 5);
         return Msg.success("").add("pageInfo", page);
     }
 
+    /*修改菜品属性*/
     @RequestMapping(value="/gai1",method=RequestMethod.GET)
     @ResponseBody
     public Msg getMe(@PathVariable("id")Integer id){
@@ -158,6 +198,47 @@ public class ProductController{
         p.setImg(img);
         productService.updateP(p);
         return Msg.success("修改成功");
+    }
+
+    /*分类查询*/
+    @ResponseBody
+    @RequestMapping(value="/category",method=RequestMethod.POST)
+    public Msg categoryP(int category, @RequestParam(value = "pn", defaultValue = "1") Integer pn) {
+        PageHelper.startPage(pn, 10);
+        List<Product> cai = productService.getCategory(category);
+        PageInfo page = new PageInfo(cai, 5);
+        return Msg.success("").add("pageInfo", page);
+    }
+
+    /*前台显示：只显示已上架商品，直接显示、搜索显示、分类显示3种*/
+    /*前台直接显示*/
+    @RequestMapping("/menuf")
+    @ResponseBody
+    public Msg getMenusf(@RequestParam(value = "pn", defaultValue = "1") Integer pn) {
+        PageHelper.startPage(pn, 10);
+        List<Product> cai = productService.getAllf();
+        PageInfo page = new PageInfo(cai, 5);
+        return Msg.success("").add("pageInfo", page);
+    }
+
+    /*前台搜索显示*/
+    @ResponseBody
+    @RequestMapping(value="/searchf",method=RequestMethod.POST)
+    public Msg searchCaif(@RequestParam(value = "pn", defaultValue = "1") Integer pn,String title){
+        PageHelper.startPage(pn, 10);
+        List<Product> men=productService.searchNamef(title);
+        PageInfo page = new PageInfo(men, 5);
+        return Msg.success("").add("pageInfo", page);
+    }
+
+    /*前台分类显示*/
+    @ResponseBody
+    @RequestMapping(value="/categoryf",method=RequestMethod.POST)
+    public Msg categoryPf(int category, @RequestParam(value = "pn", defaultValue = "1") Integer pn) {
+        PageHelper.startPage(pn, 10);
+        List<Product> cai = productService.getCategoryf(category);
+        PageInfo page = new PageInfo(cai, 5);
+        return Msg.success("").add("pageInfo", page);
     }
 
 }

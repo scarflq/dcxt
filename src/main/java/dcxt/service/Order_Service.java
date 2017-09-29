@@ -22,4 +22,12 @@ public class Order_Service {
         // TODO Auto-generated method stub
         order_mapper.updateByPrimaryKeySelective(o);
     }
+
+    public int xiadan(Order_ o) {
+        return order_mapper.insertSelective(o);
+    }
+
+    public int comment(Order_ o) {
+        return order_mapper.updateByPrimaryKeySelective(o);
+    }
 }
