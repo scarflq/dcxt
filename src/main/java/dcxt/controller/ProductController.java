@@ -179,9 +179,9 @@ public class ProductController{
     }
 
     /*修改菜品属性*/
-    @RequestMapping(value="/gai1",method=RequestMethod.GET)
+    @RequestMapping(value="/gai1",method=RequestMethod.POST)
     @ResponseBody
-    public Msg getMe(@PathVariable("id")Integer id){
+    public Msg getMe(Integer id){
         Product men = productService.getP(id);
         return Msg.success("").add("product", men);
     }

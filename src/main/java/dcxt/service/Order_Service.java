@@ -30,4 +30,8 @@ public class Order_Service {
     public int comment(Order_ o) {
         return order_mapper.updateByPrimaryKeySelective(o);
     }
+
+    public List<Order_> getAllf(String u_id) {
+        return order_mapper.selectByUid(u_id);
+    }
 }

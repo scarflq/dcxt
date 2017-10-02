@@ -84,6 +84,9 @@
       order by ${orderByClause}
     </if>
   </select>
+  <select id="selectByUid" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select * from order_ WHERE u_id = #{record.u_id,jdbcType=VARCHAR}
+  </select>
   <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
     select 
     <include refid="Base_Column_List" />

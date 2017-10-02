@@ -27,6 +27,7 @@ public class UserController {
     @Resource
     UserService userService;
 
+    /*登录*/
     @ResponseBody
     @RequestMapping(value="/login",method=RequestMethod.POST)
     public Msg login(@RequestParam(value = "username") String username,@RequestParam(value = "password") String password, HttpSession session){
@@ -52,7 +53,7 @@ public class UserController {
 
     }
 
-
+    /*注册*/
     @ResponseBody
     @RequestMapping(value="/register",method=RequestMethod.POST)
     public Msg save(@RequestParam(value = "username") String username,@RequestParam(value = "password") String password,@RequestParam(value = "password1") String password1){
@@ -103,7 +104,7 @@ public class UserController {
 
 
 
-
+    /*用户注销*/
     @ResponseBody
     @RequestMapping(value="/clear",method=RequestMethod.POST)
     public Msg clear( HttpSession session){
@@ -111,6 +112,8 @@ public class UserController {
         return Msg.success("注销成功");
     }
 
+    /*修改个人信息*/
+    /*1、获取当前用户信息*/
     @ResponseBody
     @RequestMapping(value="/changeUser",method=RequestMethod.POST)
     public Msg changeU(HttpSession session){
@@ -123,6 +126,7 @@ public class UserController {
         }
     }
 
+    /*2、输入新的个人信息*/
     @ResponseBody
     @RequestMapping(value="/changeUser2",method=RequestMethod.POST)
     public Msg changeU2(String username, String password, String address, String tel){
@@ -139,7 +143,7 @@ public class UserController {
     }
 
 
-
+    /*显示所有用户*/
     @RequestMapping("/getuser")
     @ResponseBody
     public Msg getUser(@RequestParam(value = "pn", defaultValue = "1") Integer pn) {
@@ -149,6 +153,7 @@ public class UserController {
         return Msg.success("").add("pageInfo", page);
     }
 
+    /*注销和启用*/
     @ResponseBody
     @RequestMapping(value="/zhuxiao",method=RequestMethod.POST)
     public Msg zhuxiaoUs(String username){

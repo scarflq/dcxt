@@ -24,6 +24,7 @@ public class Order_Controller{
     @Resource
     Order_Service order_Service;
 
+    /*后台显示所有订单*/
     @RequestMapping("/adord")
     @ResponseBody
     public Msg getAdord(@RequestParam(value = "pn", defaultValue = "1") Integer pn) {
@@ -33,6 +34,17 @@ public class Order_Controller{
         return Msg.success("").add("order", order);
     }
 
+    /*前台显示所有当前session储存的用户名的订单*/
+    @RequestMapping("/getOrder")
+    @ResponseBody
+    public Msg getOrder(@RequestParam(value = "pn", defaultValue = "1") Integer pn, HttpSession session) {
+        PageHelper.startPage(pn, 10);
+        String u_id="lq";
+        u_id=session.getAttribute("username").toString();
+        List<Order_> o = order_Service.getAllf(u_id);
+        PageInfo order = new PageInfo(o, 5);
+        return Msg.success("").add("order", order);
+    }
 /*    @ResponseBody
     @RequestMapping(value="/jieshou",method=RequestMethod.POST)
     public Msg changeStatus1(int id){
@@ -43,6 +55,7 @@ public class Order_Controller{
         return Msg.success("接收成功！");
     }*/
 
+    /*接收*/
     @ResponseBody
     @RequestMapping(value = "/jieshou/{id}", method = RequestMethod.PUT)
     public Msg changeStatus1(Order_ o, HttpServletRequest request) {
@@ -51,6 +64,7 @@ public class Order_Controller{
         return Msg.success("接收成功！");
     }
 
+    /*拒收*/
     @ResponseBody
     @RequestMapping(value = "/jushou/{id}", method = RequestMethod.PUT)
     public Msg changeStatus2(Order_ o, HttpServletRequest request) {
@@ -59,6 +73,7 @@ public class Order_Controller{
         return Msg.success("拒收成功！");
     }
 
+    /*送货*/
     @ResponseBody
     @RequestMapping(value = "/songhuo/{id}", method = RequestMethod.PUT)
     public Msg changeStatus3(Order_ o, HttpServletRequest request) {
@@ -67,6 +82,7 @@ public class Order_Controller{
         return Msg.success("送货！");
     }
 
+    /*取消*/
     @ResponseBody
     @RequestMapping(value = "/quxiao/{id}", method = RequestMethod.PUT)
     public Msg changeStatus4(Order_ o, HttpServletRequest request) {
@@ -75,6 +91,7 @@ public class Order_Controller{
         return Msg.success("取消订单！");
     }
 
+    /*送达*/
     @ResponseBody
     @RequestMapping(value = "/songda/{id}", method = RequestMethod.PUT)
     public Msg changeStatus5(Order_ o, HttpServletRequest request) {
@@ -83,6 +100,7 @@ public class Order_Controller{
         return Msg.success("货物已送达！");
     }
 
+    /*下单*/
     @ResponseBody
     @RequestMapping(value="/xiadan",method = RequestMethod.POST)
     public Msg xiadan(String detail, HttpSession session){
@@ -108,6 +126,7 @@ public class Order_Controller{
         }
     }
 
+    /*评论*/
     @ResponseBody
     @RequestMapping(value="/comment",method = RequestMethod.POST)
     public Msg comment(String comment, int id){

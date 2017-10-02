@@ -29,4 +29,6 @@ public interface Order_Mapper {
     int updateByPrimaryKeySelective(Order_ record);
 
     int updateByPrimaryKey(Order_ record);
+
+    List<Order_> selectByUid(String u_id);
 }
