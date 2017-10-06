@@ -33,4 +33,6 @@ public interface User_infoMapper {
     List<User_info> selectAll(User_infoExample example);
 
     List<User_info> selectMoney(User_infoExample example);
+
+    List<User_info> selectByExampleM(String test);
 }

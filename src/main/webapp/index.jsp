@@ -5,13 +5,27 @@
 <html>
 <body>
 <h2>Hello World!</h2>
-<a href="/gaie/1">lalala</a><br>
-<button id="btn">aaaaa</button>
-<script type="text/javascript">
-    var id=1;
-    $("#btn").click(function(){
-        alert("123");
-    });
+
+<script>
+    window.onload = function () {
+        var data = "id=1";
+
+        var xhr = new XMLHttpRequest();
+        xhr.withCredentials = true;
+
+        xhr.addEventListener("readystatechange", function () {
+            if (this.readyState === 4) {
+                console.log(this.responseText);
+            }
+        });
+
+        xhr.open("DELETE", "http://localhost:8080/categories");
+        xhr.setRequestHeader("content-type", "application/json");
+        xhr.setRequestHeader("cache-control", "no-cache");
+        xhr.setRequestHeader("postman-token", "4b6dd566-642f-b968-8ded-6d979f82619f");
+
+        xhr.send(data);
+    }
 </script>
 </body>
 </html>

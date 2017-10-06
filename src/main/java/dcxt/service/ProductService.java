@@ -54,7 +54,7 @@ public class ProductService {
         return categoryMapper.insertSelective(c);
     }
 
-    public int deleteCategorys(int id) {
+    public int deleteCategorys(Integer id) {
         return categoryMapper.deleteByPrimaryKey(id);
     }
 
@@ -72,5 +72,19 @@ public class ProductService {
 
     public List<Product> getCategoryf(int category) {
         return productMapper.selectByCategoryf(category);
+    }
+
+    public List<Product> searchNameAndCategory(String keyword, Integer category) {
+        Product product=new Product();
+        product.setCategory(category);
+        product.setTitle(keyword);
+        return productMapper.selectByNAC(product);
+    }
+
+    public List<Product> searchNameAndCategoryf(String test, Integer category) {
+        Product product=new Product();
+        product.setCategory(category);
+        product.setTitle(test);
+        return productMapper.selectByNACf(product);
     }
 }

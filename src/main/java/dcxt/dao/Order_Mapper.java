@@ -31,4 +31,8 @@ public interface Order_Mapper {
     int updateByPrimaryKey(Order_ record);
 
     List<Order_> selectByUid(String u_id);
+
+    List<Order_> selectByStatus(Integer status);
+
+    List<Order_> selectByUAS(Order_ o1);
 }

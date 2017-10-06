@@ -116,9 +116,7 @@
     <if test="_parameter != null">
       <include refid="Example_Where_Clause" />
     </if>
-    <if test="orderByClause != null">
-      order by ${orderByClause}
-    </if>
+    ORDER BY m.id
   </select>
   <select id="selectByExampleWithSortf" parameterType="dcxt.pojo.ProductExample" resultMap="WithSortResultMap">
     select
@@ -131,15 +129,19 @@
     <if test="_parameter != null">
       <include refid="Example_Where_Clause" />
     </if>
-    <if test="orderByClause != null">
-      order by ${orderByClause}
-    </if>
+    ORDER BY m.id
   </select>
-  <select id="selectByCategory" parameterType="java.lang.Integer" resultMap="BaseResultMap">
-    select * from product where category = #{category,jdbcType=INTEGER}
+  <select id="selectByCategory" parameterType="java.lang.Integer" resultMap="WithSortResultMap">
+    select * from product m left join category ca on m.category=ca.c_id where category = #{category,jdbcType=INTEGER}     ORDER BY m.id
   </select>
-  <select id="selectByCategoryf" parameterType="java.lang.Integer" resultMap="BaseResultMap">
-    select * from product where status = 0 AND category = #{category,jdbcType=INTEGER}
+  <select id="selectByCategoryf" parameterType="java.lang.Integer" resultMap="WithSortResultMap">
+    select * from product m left join category ca on m.category=ca.c_id where m.status = 0 AND category = #{category,jdbcType=INTEGER}     ORDER BY m.id
+  </select>
+  <select id="selectByNAC" parameterType="dcxt.pojo.Product" resultMap="WithSortResultMap">
+    select * from product m left join category ca on m.category=ca.c_id where category = #{category,jdbcType=INTEGER} AND title like "%"#{title}"%" order by id
+  </select>
+  <select id="selectByNACf" parameterType="dcxt.pojo.Product" resultMap="WithSortResultMap">
+    select * from product m left join category ca on m.category=ca.c_id where category = #{category,jdbcType=INTEGER} AND title like "%"#{title}"%" AND m.status = 0 order by id
   </select>
   <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
     select 

@@ -39,4 +39,8 @@ public interface ProductMapper {
     List<Product> selectByExamplef(String title);
 
     List<Product> selectByCategoryf(int category);
+
+    List<Product> selectByNAC(Product product);
+
+    List<Product> selectByNACf(Product product);
 }

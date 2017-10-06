@@ -62,4 +62,8 @@ public class UserService {
     public void update2(User_login ul) {
         user_loginMapper.updateByPrimaryKeySelective(ul);
     }
+
+    public List<User_info> searchByMoney(String test) {
+        return user_infoMapper.selectByExampleM(test);
+    }
 }

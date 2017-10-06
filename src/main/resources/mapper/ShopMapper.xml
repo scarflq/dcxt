@@ -151,6 +151,26 @@
       <include refid="Update_By_Example_Where_Clause" />
     </if>
   </update>
+  <update id="updateSelective" parameterType="dcxt.pojo.ShopExample">
+    update shop
+    <set>
+      <if test="record.name != null">
+        name = #{shop.name,jdbcType=VARCHAR},
+      </if>
+      <if test="record.money != null">
+        money = #{shop.money,jdbcType=REAL},
+      </if>
+      <if test="record.tel != null">
+        tel = #{shop.tel,jdbcType=VARCHAR},
+      </if>
+      <if test="record.address != null">
+        address = #{shop.address,jdbcType=VARCHAR},
+      </if>
+    </set>
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
   <update id="updateByExample" parameterType="map">
     update shop
     set name = #{record.name,jdbcType=VARCHAR},

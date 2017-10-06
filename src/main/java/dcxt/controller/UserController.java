@@ -40,15 +40,15 @@ public class UserController {
                     return Msg.success("登录成功！");
                 }
                 else{
-                    return Msg.fail("登录失败！").add("k","用户名失效！");
+                    return Msg.fail("登录失败，用户名失效！");
                 }
             }
             else{
-                return Msg.fail("登录失败！").add("k","密码错误！");
+                return Msg.fail("登录失败，密码错误");
             }
         }
         else{
-            return Msg.fail("登录失败！").add("k","无此用户！");
+            return Msg.fail("登录失败，没有该用户");
         }
 
     }
@@ -62,9 +62,9 @@ public class UserController {
             if (user_login!=null) {
                 return Msg.fail("用户名已存在！");
             } else if (!isStandardUsername(username)){
-                return Msg.success("用户名格式错误 ");
+                return Msg.fail("用户名格式错误！");
             }else if (!isStandardPassword(password)){
-                return Msg.success("密码格式错误 ");
+                return Msg.fail("密码格式错误！");
             } else{
                 User_login ul=new User_login();
                 ul.setUsername(username);
@@ -106,7 +106,7 @@ public class UserController {
 
     /*用户注销*/
     @ResponseBody
-    @RequestMapping(value="/clear",method=RequestMethod.POST)
+    @RequestMapping(value="/signout",method=RequestMethod.POST)
     public Msg clear( HttpSession session){
         session.invalidate();
         return Msg.success("注销成功");
@@ -115,7 +115,7 @@ public class UserController {
     /*修改个人信息*/
     /*1、获取当前用户信息*/
     @ResponseBody
-    @RequestMapping(value="/changeUser",method=RequestMethod.POST)
+    @RequestMapping(value="/user",method=RequestMethod.GET)
     public Msg changeU(HttpSession session){
         if(session.getAttribute("username")!=null){
             User_info men = userService.getU(session.getAttribute("username").toString());
@@ -128,7 +128,7 @@ public class UserController {
 
     /*2、输入新的个人信息*/
     @ResponseBody
-    @RequestMapping(value="/changeUser2",method=RequestMethod.POST)
+    @RequestMapping(value="/user",method=RequestMethod.PUT)
     public Msg changeU2(String username, String password, String address, String tel){
         User_info ui=new User_info();
         ui.setUsername(username);
@@ -142,20 +142,9 @@ public class UserController {
         return Msg.success("修改成功！");
     }
 
-
-    /*显示所有用户*/
-    @RequestMapping("/getuser")
-    @ResponseBody
-    public Msg getUser(@RequestParam(value = "pn", defaultValue = "1") Integer pn) {
-        PageHelper.startPage(pn, 10);
-        List<User_info> us =userService.getAll();
-        PageInfo page = new PageInfo(us, 5);
-        return Msg.success("").add("pageInfo", page);
-    }
-
     /*注销和启用*/
     @ResponseBody
-    @RequestMapping(value="/zhuxiao",method=RequestMethod.POST)
+    @RequestMapping(value="/user_remove",method=RequestMethod.POST)
     public Msg zhuxiaoUs(String username){
         User_info u=new User_info();
         u.setStatus(1);
@@ -165,7 +154,7 @@ public class UserController {
     }
 
     @ResponseBody
-    @RequestMapping(value="/qiyong",method=RequestMethod.POST)
+    @RequestMapping(value="/user_recover",method=RequestMethod.POST)
     public Msg qiyongUs(String username){
         User_info u=new User_info();
         u.setUsername(username);
@@ -174,10 +163,62 @@ public class UserController {
         return Msg.success("启用成功！");
     }
 
+    /*修改用户信息*/
+    @ResponseBody
+    @RequestMapping(value="/ad_user",method=RequestMethod.POST)
+    public Msg adChangeU2(String username, Float money, String address, String tel) throws UnsupportedEncodingException {
+        User_info ui=new User_info();
+        ui.setUsername(username);
+        String add=new String(address.getBytes("ISO-8859-1"), "UTF-8");
+        ui.setAddress(add);
+        ui.setTel(tel);
+        ui.setMoney(money);
+        userService.update(ui);
+        return Msg.success("修改成功！");
+    }
+
+    /*显示所有用户*/
+    /*如果money无值则按用户名排序，否则输入money=1（或者任意不为0的数字）则按余额排序*/
+    @RequestMapping(value = "/users", method = RequestMethod.POST)
+    @ResponseBody
+    public Msg getUsers(
+            @RequestParam(value = "pn", defaultValue = "1") Integer pn,
+            @RequestParam(value = "search", defaultValue = "null") String keyword,
+            @RequestParam(value = "money", defaultValue = "0") Integer money
+    ) throws UnsupportedEncodingException {
+        PageHelper.startPage(pn, 5);
+        List<User_info> users;
+        String test= new String(keyword.getBytes("ISO-8859-1"), "UTF-8");
+        if(keyword.equals("null")) {
+            if(money.equals(0)){
+                users = userService.getAll();
+            }
+            else {
+                users = userService.money();
+            }
+        } else {
+            if(money.equals(0)){
+                users = userService.search(test);
+            }
+            else{
+                users = userService.searchByMoney(test);
+            }
+        }
+        PageInfo page = new PageInfo(users, 5);
+        return Msg.success("").add("pageInfo", page);
+    }
+
+
+
+    public Msg getUser(@RequestParam(value = "pn", defaultValue = "1") Integer pn) {
+        PageHelper.startPage(pn, 10);
+        List<User_info> us =userService.getAll();
+        PageInfo page = new PageInfo(us, 5);
+        return Msg.success("").add("pageInfo", page);
+    }
+
     /*模糊查询*/
     /*查找用户名*/
-    @ResponseBody
-    @RequestMapping(value="/searchUser/{title}",method=RequestMethod.GET)
     public Msg searchuser(@RequestParam(value = "pn", defaultValue = "1") Integer pn,@PathVariable("title")String title){
         PageHelper.startPage(pn, 10);
         String title1 = null;
@@ -190,31 +231,7 @@ public class UserController {
         PageInfo page = new PageInfo(men, 5);
         return Msg.success("").add("pageInfo", page);
     }
-
-    /*修改用户信息*/
-    @RequestMapping(value="/adChangeU",method=RequestMethod.POST)
-    @ResponseBody
-    public Msg adChangeU(String username){
-        User_info men = userService.getU(username);
-        return Msg.success("").add("user_info", men);
-    }
-
-
-    @ResponseBody
-    @RequestMapping(value="/adChangeU2",method=RequestMethod.POST)
-    public Msg adChangeU2(String username, float money, String address, String tel){
-        User_info ui=new User_info();
-        ui.setUsername(username);
-        ui.setAddress(address);
-        ui.setTel(tel);
-        ui.setMoney(money);
-        userService.update(ui);
-        return Msg.success("修改成功！");
-    }
-
     /*按照余额排序*/
-    @RequestMapping("/money")
-    @ResponseBody
     public Msg money(@RequestParam(value = "pn", defaultValue = "1") Integer pn) {
         PageHelper.startPage(pn, 10);
         List<User_info> us =userService.money();
