@@ -169,8 +169,11 @@ public class UserController {
     public Msg adChangeU2(String username, Float money, String address, String tel) throws UnsupportedEncodingException {
         User_info ui=new User_info();
         ui.setUsername(username);
-        String add=new String(address.getBytes("ISO-8859-1"), "UTF-8");
-        ui.setAddress(add);
+        if (address!=null)
+        {
+            String add=new String(address.getBytes("ISO-8859-1"), "UTF-8");
+            ui.setAddress(add);
+        }
         ui.setTel(tel);
         ui.setMoney(money);
         userService.update(ui);
