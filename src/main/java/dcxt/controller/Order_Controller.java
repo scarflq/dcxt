@@ -1,5 +1,7 @@
 package dcxt.controller;
 
+import dcxt.bean.Detail;
+import dcxt.bean.GsonUtil;
 import dcxt.bean.Msg;
 import javax.servlet.http.HttpServletRequest;
 import dcxt.pojo.Order_;
@@ -14,6 +16,7 @@ import javax.servlet.http.HttpSession;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
@@ -51,7 +54,9 @@ public class Order_Controller{
                         HttpSession session) {
         PageHelper.startPage(pn, 10);
         String u_id="lq";
-        u_id=session.getAttribute("username").toString();
+        if(session.getAttribute("username")!=null) {
+            u_id = session.getAttribute("username").toString();
+        }
         List<Order_> o ;
         if(status.equals(0)){
             o = order_Service.getAllf(u_id);
@@ -65,15 +70,6 @@ public class Order_Controller{
         PageInfo order = new PageInfo(o, 5);
         return Msg.success("").add("order", order);
     }
-/*    @ResponseBody
-    @RequestMapping(value="/jieshou",method=RequestMethod.POST)
-    public Msg changeStatus1(int id){
-        Order_ o=new Order_();
-        o.setId(id);
-        o.setStatus(2);
-        order_Service.changeStatus(o);
-        return Msg.success("接收成功！");
-    }*/
 
     /*接收*/
     @ResponseBody
@@ -124,26 +120,45 @@ public class Order_Controller{
     @ResponseBody
     @RequestMapping(value="/order",method = RequestMethod.POST)
     public Msg xiadan(String detail, HttpSession session){
-        if(session.getAttribute("username")!=null){
-            Order_ o=new Order_();
-            o.setStatus(1);
-            String uid="lq";
-            uid=session.getAttribute("username").toString();
-            o.setuId(uid);
-            Date date = new Date();
-            Timestamp timeStamp = new Timestamp(date.getTime());
-            o.setCreateTime(timeStamp);
-            o.setDetail(detail);
-            int i=order_Service.xiadan(o);
-            if (i==1) {
-                return Msg.success("下单成功！");
-            }else{
-                return Msg.fail("下单失败！");
-            }
+        Order_ o=new Order_();
+        o.setStatus(1);
+        String uid="lq";
+        if(session.getAttribute("username")!=null) {
+            uid = session.getAttribute("username").toString();
         }
-        else{
-            return Msg.fail("请先登录！");
+        o.setuId(uid);
+        Date date = new Date();
+        Timestamp timeStamp = new Timestamp(date.getTime());
+        o.setCreateTime(timeStamp);
+        o.setDetail(detail);
+        int i=order_Service.xiadan(o);
+        int ret=add_day_info(detail);
+        if (i==1) {
+            return Msg.success("下单成功！");
+        }else{
+            return Msg.fail("下单失败！");
         }
+    }
+
+    public int add_day_info(String detail){
+        int order_num,product_num=0;
+        int total=0;
+        List<Detail> list = null;
+        try {
+            list = GsonUtil.fromJsonArray(detail,Detail.class);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        order_num=list.size();
+        for(int i=0;i<order_num;i++){
+            product_num+=list.get(i).getNum();
+            total+=list.get(i).getPrice()*list.get(i).getNum();
+        }
+        Date date = new Date();
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        String a=sdf.format(date);
+        int ret=order_Service.add_day_info(a,order_num,product_num,total);
+        return ret;
     }
 
     /*评论*/

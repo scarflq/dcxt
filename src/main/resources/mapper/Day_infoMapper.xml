@@ -88,6 +88,9 @@
     from day_info
     where date_ = #{date,jdbcType=VARCHAR}
   </select>
+  <select id="getweek" resultMap="BaseResultMap">
+    SELECT * FROM day_info ORDER BY date_ DESC limit 8
+  </select>
   <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
     delete from day_info
     where date_ = #{date,jdbcType=VARCHAR}
@@ -140,6 +143,9 @@
     <if test="_parameter != null">
       <include refid="Example_Where_Clause" />
     </if>
+  </select>
+  <select id="getTotal" resultType="java.lang.Integer">
+    select SUM(price_total) from day_info
   </select>
   <update id="updateByExampleSelective" parameterType="map">
     update day_info

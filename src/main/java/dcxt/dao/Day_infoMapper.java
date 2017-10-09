@@ -29,4 +29,8 @@ public interface Day_infoMapper {
     int updateByPrimaryKeySelective(Day_info record);
 
     int updateByPrimaryKey(Day_info record);
+
+    int getTotal();
+
+    List<Day_info> getweek();
 }

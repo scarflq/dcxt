@@ -144,23 +144,13 @@ public class UserController {
 
     /*注销和启用*/
     @ResponseBody
-    @RequestMapping(value="/user_remove",method=RequestMethod.POST)
-    public Msg zhuxiaoUs(String username){
-        User_info u=new User_info();
-        u.setStatus(1);
+    @RequestMapping(value = "/user_status", method = RequestMethod.POST)
+    public Msg changeUserStatus(String username, Integer status) {
+        User_info u = new User_info();
+        u.setStatus(status);
         u.setUsername(username);
         userService.update(u);
-        return Msg.success("注销成功！");
-    }
-
-    @ResponseBody
-    @RequestMapping(value="/user_recover",method=RequestMethod.POST)
-    public Msg qiyongUs(String username){
-        User_info u=new User_info();
-        u.setUsername(username);
-        u.setStatus(0);
-        userService.update(u);
-        return Msg.success("启用成功！");
+        return Msg.success("修改成功");
     }
 
     /*修改用户信息*/
