@@ -31,7 +31,7 @@ public class UserService {
         return user_infoMapper.selectByExample(title1);
     }
 
-    public List<User_info> money() {
+    public List<User_info> search() {
         return user_infoMapper.selectMoney(null);
     }
 
@@ -65,5 +65,10 @@ public class UserService {
 
     public List<User_info> searchByMoney(String test) {
         return user_infoMapper.selectByExampleM(test);
+    }
+
+    // 多条件查询
+    public List<User_info> multiSearch(String keyword, String money_sort){
+        return user_infoMapper.multiSearch(keyword, money_sort);
     }
 }

@@ -249,4 +249,22 @@
       status = #{status,jdbcType=INTEGER}
     where username = #{username,jdbcType=VARCHAR}
   </update>
+  <select id="multiSearch" resultMap="BaseResultMap">
+    select * from user_info
+
+    <if test="keyword != null">
+      where username like "%"#{keyword}"%"
+    </if>
+
+    <if test="money_sort != null">
+      order by money
+      <if test="money_sort == 'ascend'">
+        ASC
+      </if>
+      <if test="money_sort == 'descend'">
+        DESC
+      </if>
+    </if>
+    ORDER BY create_time DESC
+  </select>
 </mapper>

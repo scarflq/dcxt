@@ -26,8 +26,8 @@ public class ProductService {
         productMapper.updateByPrimaryKeySelective(p);
     }
 
-    public void insertProduct(Product product) {
-        productMapper.insertSelective(product);
+    public int insertProduct(Product product) {
+        return productMapper.insertSelective(product);
     }
 
     public List<Product> searchName(String title) {
@@ -55,6 +55,7 @@ public class ProductService {
     }
 
     public int deleteCategorys(Integer id) {
+        productMapper.deleteByCategory(id);
         return categoryMapper.deleteByPrimaryKey(id);
     }
 
@@ -87,4 +88,5 @@ public class ProductService {
         product.setTitle(test);
         return productMapper.selectByNACf(product);
     }
+
 }

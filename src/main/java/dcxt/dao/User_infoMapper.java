@@ -35,4 +35,9 @@ public interface User_infoMapper {
     List<User_info> selectMoney(User_infoExample example);
 
     List<User_info> selectByExampleM(String test);
+
+    List<User_info> multiSearch(
+            @Param("keyword") String keyword,
+            @Param("money_sort") String money_sort
+    );
 }

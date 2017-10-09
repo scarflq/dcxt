@@ -177,65 +177,20 @@ public class UserController {
         return Msg.success("修改成功！");
     }
 
-    /*显示所有用户*/
-    /*如果money无值则按用户名排序，否则输入money=1（或者任意不为0的数字）则按余额排序*/
-    @RequestMapping(value = "/users", method = RequestMethod.POST)
+    /* 查询 */
+    /* keyword 模糊查询 */
+    /* money = 'descend' 降序
+     * money = 'ascend' 升序 */
+    @RequestMapping(value = "/users", method = RequestMethod.GET)
     @ResponseBody
     public Msg getUsers(
-            @RequestParam(value = "pn", defaultValue = "1") Integer pn,
-            @RequestParam(value = "search", defaultValue = "null") String keyword,
-            @RequestParam(value = "money", defaultValue = "0") Integer money
+            @RequestParam(value = "pn", defaultValue = "1") Integer pn, String keyword, String money_sort
     ) throws UnsupportedEncodingException {
-        PageHelper.startPage(pn, 5);
+        /*System.out.println(money_sort);*/
+        PageHelper.startPage(pn, 20);
         List<User_info> users;
-        String test= new String(keyword.getBytes("ISO-8859-1"), "UTF-8");
-        if(keyword.equals("null")) {
-            if(money.equals(0)){
-                users = userService.getAll();
-            }
-            else {
-                users = userService.money();
-            }
-        } else {
-            if(money.equals(0)){
-                users = userService.search(test);
-            }
-            else{
-                users = userService.searchByMoney(test);
-            }
-        }
-        PageInfo page = new PageInfo(users, 5);
-        return Msg.success("").add("pageInfo", page);
-    }
-
-
-
-    public Msg getUser(@RequestParam(value = "pn", defaultValue = "1") Integer pn) {
-        PageHelper.startPage(pn, 10);
-        List<User_info> us =userService.getAll();
-        PageInfo page = new PageInfo(us, 5);
-        return Msg.success("").add("pageInfo", page);
-    }
-
-    /*模糊查询*/
-    /*查找用户名*/
-    public Msg searchuser(@RequestParam(value = "pn", defaultValue = "1") Integer pn,@PathVariable("title")String title){
-        PageHelper.startPage(pn, 10);
-        String title1 = null;
-        try {
-            title1 = new String(title.getBytes("ISO-8859-1"),"UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
-        List<User_info> men=userService.search(title1);
-        PageInfo page = new PageInfo(men, 5);
-        return Msg.success("").add("pageInfo", page);
-    }
-    /*按照余额排序*/
-    public Msg money(@RequestParam(value = "pn", defaultValue = "1") Integer pn) {
-        PageHelper.startPage(pn, 10);
-        List<User_info> us =userService.money();
-        PageInfo page = new PageInfo(us, 5);
+        users = userService.multiSearch(keyword, money_sort);
+        PageInfo page = new PageInfo(users, 20);
         return Msg.success("").add("pageInfo", page);
     }
 

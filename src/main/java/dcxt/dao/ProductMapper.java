@@ -43,4 +43,6 @@ public interface ProductMapper {
     List<Product> selectByNAC(Product product);
 
     List<Product> selectByNACf(Product product);
+
+    void deleteByCategory(Integer id);
 }

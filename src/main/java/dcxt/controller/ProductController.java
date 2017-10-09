@@ -4,7 +4,9 @@ import dcxt.bean.Msg;
 import dcxt.pojo.Category;
 import dcxt.pojo.Product;
 import dcxt.service.ProductService;
+
 import javax.servlet.http.HttpServletRequest;
+
 import dcxt.service.QiNiuImageStyleService;
 import dcxt.service.UploadService;
 import org.springframework.stereotype.Controller;
@@ -13,10 +15,13 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMethod;
+
 import javax.annotation.Resource;
+
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import org.springframework.web.multipart.MultipartFile;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -29,7 +34,7 @@ import javax.servlet.ServletContext;
 
 @Controller
 @RequestMapping("")
-public class ProductController{
+public class ProductController {
     @Resource
     ProductService productService;
 
@@ -38,9 +43,10 @@ public class ProductController{
 
     @Resource
     QiNiuImageStyleService qiNiuImageStyleService;
+
     @RequestMapping(value = "/upload", method = RequestMethod.POST)
     @ResponseBody
-    public Msg Upload(@RequestParam("file") MultipartFile file,@RequestParam String width,HttpServletRequest request) throws IOException {
+    public Msg Upload(@RequestParam("file") MultipartFile file, @RequestParam String width, HttpServletRequest request) throws IOException {
 
         // 获得原始文件名
         String fileOriginalName = file.getOriginalFilename();
@@ -76,13 +82,13 @@ public class ProductController{
     @RequestMapping(value = "/categories", method = RequestMethod.POST)
     @ResponseBody
     public Msg addCategorys(String title) {
-        Category c=new Category();
+        Category c = new Category();
         c.setcTitle(title);
-        int i=productService.addCategorys(c);
-        if (i==1) {
-            return Msg.success("新增成功！");
-        }else{
-            return Msg.fail("新增失败！");
+        int ret = productService.addCategorys(c);
+        if (ret == 1) {
+            return Msg.success("新增成功！").add("status", ret);
+        } else {
+            return Msg.fail("新增失败！").add("status", ret);
         }
     }
 
@@ -90,26 +96,26 @@ public class ProductController{
     @RequestMapping(value = "/delete_category", method = RequestMethod.POST)
     @ResponseBody
     public Msg deleteCategorys(Integer id) {
-        int i=productService.deleteCategorys(id);
-        if (i==1) {
-            return Msg.success("删除成功！");
-        }else{
-            return Msg.fail("删除失败！");
+        int ret = productService.deleteCategorys(id);
+        if (ret == 1) {
+            return Msg.success("删除成功！").add("status", ret);
+        } else {
+            return Msg.fail("删除失败！").add("status", ret);
         }
     }
 
     /*改*/
-    @RequestMapping(value = "/categories", method = RequestMethod.PUT)
+    @RequestMapping(value = "/update_category", method = RequestMethod.POST)
     @ResponseBody
     public Msg updateCategorys(Integer id, String title) {
-        Category c=new Category();
+        Category c = new Category();
         c.setcId(id);
         c.setcTitle(title);
-        int i=productService.updateCategorys(c);
-        if (i==1) {
-            return Msg.success("修改成功！");
-        }else{
-            return Msg.fail("修改失败！");
+        int ret = productService.updateCategorys(c);
+        if (ret == 1) {
+            return Msg.success("修改成功！").add("status", ret);
+        } else {
+            return Msg.fail("修改失败！").add("status", ret);
         }
     }
 
@@ -123,10 +129,10 @@ public class ProductController{
 
 
     /*新增菜品*/
-    @RequestMapping(value="/product",method=RequestMethod.POST)
+    @RequestMapping(value = "/product", method = RequestMethod.POST)
     @ResponseBody
-    public Msg xinzeng(String title,String description, String img,float price ,int category){
-        Product product=new Product();
+    public Msg xinzeng(String title, String description, String img, float price, int category) {
+        Product product = new Product();
         product.setCategory(category);
         product.setDescription(description);
         product.setTitle(title);
@@ -137,8 +143,12 @@ public class ProductController{
         Date date = new Date();
         Timestamp timeStamp = new Timestamp(date.getTime());
         product.setCreateTime(timeStamp);
-        productService.insertProduct(product);
-        return Msg.success("新增成功");
+        int status = productService.insertProduct(product);
+        if (status == 0) {
+            return Msg.fail("新增菜品失败");
+        } else {
+            return Msg.success("新增菜品成功");
+        }
     }
 
     /*下架*/
@@ -161,9 +171,9 @@ public class ProductController{
 
     /*修改菜品属性*/
     @ResponseBody
-    @RequestMapping(value="/product",method=RequestMethod.PUT)
-    public Msg saveMe(Integer id,String title,String description, String img,Float price ,Integer category){
-        Product p=new Product();
+    @RequestMapping(value = "/product", method = RequestMethod.PUT)
+    public Msg saveMe(Integer id, String title, String description, String img, Float price, Integer category) {
+        Product p = new Product();
         p.setId(id);
         p.setCategory(category);
         p.setDescription(description);
@@ -174,33 +184,28 @@ public class ProductController{
         return Msg.success("修改成功");
     }
 
-    /*显示菜单*/
-    @RequestMapping(value = "/products", method = RequestMethod.POST)
+    /*后台显示菜单*/
+    @RequestMapping(value = "/products", method = RequestMethod.GET)
     @ResponseBody
-    public Msg getMenus(
-            @RequestParam(value = "pn", defaultValue = "1") Integer pn,
-            @RequestParam(value = "search", defaultValue = "null") String keyword,
-            @RequestParam(value = "category", defaultValue = "0") Integer category
-    ) throws UnsupportedEncodingException {
+    public Msg getMenus(@RequestParam(value = "pn", defaultValue = "1") Integer pn, String keyword, Integer category) throws UnsupportedEncodingException {
         PageHelper.startPage(pn, 5);
         List<Product> products;
-        String test= new String(keyword.getBytes("ISO-8859-1"), "UTF-8");
-        if(keyword.equals("null")) {
-            if(category.equals(0)){
+        String test;
+        if (keyword == null) {
+            if (category == null) {
                 products = productService.getAll();
-            }
-            else {
+            } else {
                 products = productService.getCategory(category);
             }
         } else {
-            if(category.equals(0)){
+            test= new String(keyword.getBytes("ISO-8859-1"), "UTF-8");
+            if (category == null) {
                 products = productService.searchName(test);
-            }
-            else{
-                products = productService.searchNameAndCategory(test,category);
+            } else {
+                products = productService.searchNameAndCategory(test, category);
             }
         }
-        PageInfo page = new PageInfo(products, 5);
+        PageInfo page = new PageInfo(products, 10);
         return Msg.success("").add("pageInfo", page);
     }
 
@@ -208,27 +213,22 @@ public class ProductController{
     /*前台显示：只显示已上架商品，直接显示、搜索显示、分类显示3种*/
     @RequestMapping(value = "/user_products", method = RequestMethod.POST)
     @ResponseBody
-    public Msg getMenusForUser(
-            @RequestParam(value = "pn", defaultValue = "1") Integer pn,
-            @RequestParam(value = "search", defaultValue = "null") String keyword,
-            @RequestParam(value = "category", defaultValue = "0") Integer category
-    ) throws UnsupportedEncodingException {
+    public Msg getMenusForUser(@RequestParam(value = "pn", defaultValue = "1") Integer pn, String keyword, Integer category) throws UnsupportedEncodingException {
         PageHelper.startPage(pn, 5);
         List<Product> products;
-        String test= new String(keyword.getBytes("ISO-8859-1"), "UTF-8");
-        if(keyword.equals("null")) {
-            if(category.equals(0)){
+        String test;
+        if (keyword == null) {
+            if (category == null) {
                 products = productService.getAllf();
-            }
-            else {
+            } else {
                 products = productService.getCategoryf(category);
             }
         } else {
-            if(category.equals(0)){
+            test= new String(keyword.getBytes("ISO-8859-1"), "UTF-8");
+            if (category == null) {
                 products = productService.searchNamef(test);
-            }
-            else{
-                products = productService.searchNameAndCategoryf(test,category);
+            } else {
+                products = productService.searchNameAndCategoryf(test, category);
             }
         }
         PageInfo page = new PageInfo(products, 5);
