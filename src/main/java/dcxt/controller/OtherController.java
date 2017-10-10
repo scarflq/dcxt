@@ -57,15 +57,21 @@ public class OtherController {
     public Msg getDay_info(){
         int total_money=otherService.getTotal();
         Date date=new Date();//取时间
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+        String today = formatter.format(date);
         Calendar calendar = new GregorianCalendar();
         calendar.setTime(date);
         calendar.add(calendar.DATE,-1);//把日期往后增加一天.整数往后推,负数往前移动
         date=calendar.getTime(); //这个时间就是日期往后推一天的结果
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-        String day7 = formatter.format(date);
-        Day_info lastDay=otherService.getDay(day7);
+        String last_day = formatter.format(date);
+        Day_info lastDay=otherService.getDay(last_day);
         List<Day_info> lastWeekDetail=otherService.getWeek();
-        lastWeekDetail.remove(0);
+        Day_info today_=otherService.getDay(today);
+        if(today_==null){
+            lastWeekDetail.remove(7);
+        }else {
+            lastWeekDetail.remove(0);
+        }
         Day_info lastWeek=new Day_info();
         int product_num=0;
         int order_num=0;
