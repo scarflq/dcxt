@@ -36,7 +36,7 @@ public class UserController {
             if (password.equals(ul.getPassword())){
                 User_info ui=userService.getStates(ul.getUsername());
                 if(ui.getStatus()!=1){
-                    session.setAttribute("username",ui.getUsername());
+                    /*session.setAttribute("username",ui.getUsername());*/
                     return Msg.success("登录成功！");
                 }
                 else{
@@ -108,7 +108,7 @@ public class UserController {
     @ResponseBody
     @RequestMapping(value="/signout",method=RequestMethod.POST)
     public Msg clear( HttpSession session){
-        session.invalidate();
+        /*session.invalidate();*/
         return Msg.success("注销成功");
     }
 
@@ -116,14 +116,9 @@ public class UserController {
     /*1、获取当前用户信息*/
     @ResponseBody
     @RequestMapping(value="/user",method=RequestMethod.GET)
-    public Msg changeU(HttpSession session){
-        if(session.getAttribute("username")!=null){
-            User_info men = userService.getU(session.getAttribute("username").toString());
-            return Msg.success("").add("user_info", men);
-        }
-        else{
-            return Msg.fail("请先登录！");
-        }
+    public Msg changeU(String username){
+        User_info men = userService.getU(username);
+        return Msg.success("").add("user_info", men);
     }
 
     /*2、输入新的个人信息*/

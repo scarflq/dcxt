@@ -51,11 +51,11 @@ public class Order_Controller{
     @ResponseBody
     public Msg getOrder(@RequestParam(value = "pn", defaultValue = "1") Integer pn,
                         @RequestParam(value = "status", defaultValue = "0") Integer status,
-                        HttpSession session) {
-        PageHelper.startPage(pn, 10);
+                        String username) {
+        PageHelper.startPage(pn, 100);
         String u_id="lq";
-        if(session.getAttribute("username")!=null) {
-            u_id = session.getAttribute("username").toString();
+        if(username!=null) {
+            u_id = username;
         }
         List<Order_> o ;
         if(status.equals(0)){
@@ -119,12 +119,12 @@ public class Order_Controller{
     /*下单*/
     @ResponseBody
     @RequestMapping(value="/order",method = RequestMethod.POST)
-    public Msg xiadan(String detail, HttpSession session){
+    public Msg xiadan(String detail, String username){
         Order_ o=new Order_();
         o.setStatus(1);
         String uid="lq";
-        if(session.getAttribute("username")!=null) {
-            uid = session.getAttribute("username").toString();
+        if( username != null) {
+            uid = username;
         }
         o.setuId(uid);
         Date date = new Date();

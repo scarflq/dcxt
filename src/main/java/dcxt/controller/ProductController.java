@@ -214,7 +214,7 @@ public class ProductController {
     @RequestMapping(value = "/user_products", method = RequestMethod.POST)
     @ResponseBody
     public Msg getMenusForUser(@RequestParam(value = "pn", defaultValue = "1") Integer pn, String keyword, Integer category) throws UnsupportedEncodingException {
-        PageHelper.startPage(pn, 5);
+        PageHelper.startPage(pn, 100);
         List<Product> products;
         String test;
         if (keyword == null) {
