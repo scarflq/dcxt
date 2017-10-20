@@ -39,12 +39,6 @@
 
 
         <!-- table指定每个表的生成策略 -->
-        <table tableName="category" domainObjectName="Category"></table>
-        <table tableName="day_info" domainObjectName="Day_info"></table>
-        <table tableName="order_" domainObjectName="Order_"></table>
-        <table tableName="product" domainObjectName="Product"></table>
-        <table tableName="shop" domainObjectName="Shop"></table>
-        <table tableName="user_info" domainObjectName="User_info"></table>
-        <table tableName="user_login" domainObjectName="User_login"></table>
+        <table tableName="lala" domainObjectName="Lala"></table>
     </context>
 </generatorConfiguration>

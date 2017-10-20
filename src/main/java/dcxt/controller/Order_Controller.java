@@ -71,6 +71,7 @@ public class Order_Controller{
         return Msg.success("").add("order", order);
     }
 
+
     /*接收*/
     @ResponseBody
     @RequestMapping(value = "/order/receive/{id}", method = RequestMethod.PUT)
